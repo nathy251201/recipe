@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: recipe-core-ingress
+spec:
+  rules:
+  - host: recipe-core.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: recipe-core-service
+            port:
+              number: 8000

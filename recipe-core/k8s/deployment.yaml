@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-core-deployment
+  labels:
+    app: recipe-core
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: recipe-core
+  template:
+    metadata:
+      labels:
+        app: recipe-core
+    spec:
+      containers:
+      - name: recipe-core
+        image: recipe-core:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: recipe-core-config
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5

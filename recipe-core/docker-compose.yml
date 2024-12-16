@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  recipe-db:
+    image: postgres:15
+    container_name: recipe-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: recipe_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - recipe-data:/var/lib/postgresql/data
+
+  recipe-core:
+    build:
+      context: ./core
+    container_name: recipe-core
+    depends_on:
+      - recipe-db
+    ports:
+      - "8000:8000"
+    env_file:
+      - core/recipe.conf
+    command: >
+      sh -c "until nc -z recipe-db 5432;
+            python -u manage.py migrate &&
+            python -u production-server.py"
+
+  recipe-frontend:
+    build:
+      context: ./frontend
+    container_name: recipe-frontend
+    ports:
+      - "80:80"
+    env_file:
+      - frontend/.env
+
+volumes:
+  recipe-data:
